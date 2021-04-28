@@ -28,9 +28,13 @@ class startDraw {
 		this.stacks = []; // 用来存储操作步骤
 		this.move = (e) => {
 			if (this.canDraw) {
+				if (this.isMobile()) {
+					e.preventDefault();
+					e = e.touches[0];
+				}
 				const ctx = this.context;
-				this.x = e.layerX;
-				this.y = e.layerY;
+				this.x = e.clientX;
+				this.y = e.clientY;
 				const p = { x: this.x, y: this.y };
 				ctx.lineTo(p.x, p.y);
 				this.current.push(p);
@@ -42,10 +46,11 @@ class startDraw {
 			this.stacks.push(this.current);
 		};
 		this.down = (e) => {
+			e = this.isMobile() ? e.touches[0] : e;
 			const ctx = this.context;
 			this.canDraw = true;
-			this.x = e.layerX;
-			this.y = e.layerY;
+			this.x = e.clientX;
+			this.y = e.clientY;
 			ctx.beginPath();
 			this.current = [];
 			const p = { x: this.x, y: this.y };
@@ -82,17 +87,38 @@ class startDraw {
 		this.bindEvent();
 		this.addRecall();
 	}
+	isMobile() {
+		return /phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone/i.test(
+			navigator.userAgent
+		);
+	}
 	bindEvent() {
 		const el = this.el;
-		el.addEventListener('mousedown', this.down);
-		document.addEventListener('mousemove', this.move);
-		document.addEventListener('mouseup', this.up);
+		let down = 'mousedown';
+		let move = 'mousemove';
+		let up = 'mouseup';
+		if (this.isMobile()) {
+			down = 'touchstart';
+			move = 'touchmove';
+			up = 'touchend';
+		}
+		el.addEventListener(down, this.down);
+		document.addEventListener(move, this.move, { passive: false });
+		document.addEventListener(up, this.up);
 	}
 	removeEvent() {
 		const el = this.el;
-		el.removeEventListener('mousedown', this.down);
-		document.removeEventListener('mousemove', this.move);
-		document.removeEventListener('mouseup', this.up);
+		let down = 'mousedown';
+		let move = 'mousemove';
+		let up = 'mouseup';
+		if (this.isMobile()) {
+			down = 'touchstart';
+			move = 'touchmove';
+			up = 'touchend';
+		}
+		el.removeEventListener(down, this.down);
+		document.removeEventListener(move, this.move);
+		document.removeEventListener(up, this.up);
 	}
 	// 添加撤回操作
 	addRecall() {
