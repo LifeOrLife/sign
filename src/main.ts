@@ -154,6 +154,10 @@ class startDraw {
 		const ctx = this.context;
 		ctx.clearRect(0, 0, this.width, this.height);
 	}
+	resetCanvas() {
+		this.stacks = [];
+		this.clear();
+	}
 	getPNGImage() {
 		const canvas = this.el as HTMLCanvasElement;
 		return canvas.toDataURL('image/png');
@@ -207,6 +211,5 @@ revoke.addEventListener('click', () => {
 	pen.rePatint();
 });
 clear.addEventListener('click', () => {
-	pen.clear();
+	pen.resetCanvas();
 });
-console.log(pen);
