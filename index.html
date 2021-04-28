@@ -14,11 +14,32 @@
             border: 2px solid rgba(102, 204, 255, .4);
             max-width: 100%;
         }
+
+        .btn {
+            color: #fff;
+            background: #6cf;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 3px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:active {
+            background: rgb(45, 174, 238);
+        }
     </style>
 </head>
 
 <body>
-    <canvas class="pen"></canvas>
+    <div class="pen-box">
+        <canvas class="pen"></canvas>
+        <div class="btns">
+            <button class="download btn">下载</button>
+            <button class="revoke btn">撤销</button>
+            <button class="clear btn">清空</button>
+        </div>
+    </div>
     <script type="module" src="./src/main.ts"></script>
 </body>
 

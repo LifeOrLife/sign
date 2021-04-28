@@ -42,8 +42,10 @@ class startDraw {
 			}
 		};
 		this.up = (e) => {
+			if (this.canDraw) {
+				this.stacks.push(this.current);
+			}
 			this.canDraw = false;
-			this.stacks.push(this.current);
 		};
 		this.down = (e) => {
 			e = this.isMobile() ? e.touches[0] : e;
@@ -124,13 +126,14 @@ class startDraw {
 	addRecall() {
 		document.addEventListener('keydown', (e) => {
 			if (e.ctrlKey && e.code === 'KeyZ') {
-				this.stacks = this.stacks.slice(0, -1);
 				this.rePatint();
 			}
 		});
 	}
 	// 重新绘制点
 	rePatint() {
+		const stacks = this.stacks.slice(0, -1);
+		this.stacks = stacks;
 		this.clear();
 		if (!this.stacks.length) {
 			console.log('没有内容');
@@ -186,6 +189,24 @@ class startDraw {
 		return new File([u8arr], '', { type: mime });
 	}
 }
+
+function getEl(sel: string): HTMLElement {
+	return document.querySelector(sel);
+}
+
 const el = document.querySelector('.pen');
 const pen = new startDraw(el);
 pen.init();
+const download = getEl('.download');
+const revoke = getEl('.revoke');
+const clear = getEl('.clear');
+download.addEventListener('click', () => {
+	pen.downloadPNGImage();
+});
+revoke.addEventListener('click', () => {
+	pen.rePatint();
+});
+clear.addEventListener('click', () => {
+	pen.clear();
+});
+console.log(pen);
