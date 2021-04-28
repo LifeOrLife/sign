@@ -7,12 +7,14 @@ type stacks = { x: number; y: number }[];
 class startDraw {
 	el: HTMLElement;
 	config: config;
-	stacks: stacks;
+	stacks: stacks[];
+	current?: stacks;
 	context?: CanvasRenderingContext2D;
 	width?: number;
 	height?: number;
 	move?: (e) => void;
 	up?: (e) => void;
+	down?: (e) => void;
 	canDraw?: boolean;
 	x?: number;
 	y?: number;
@@ -29,12 +31,26 @@ class startDraw {
 				const ctx = this.context;
 				this.x = e.layerX;
 				this.y = e.layerY;
-				ctx.lineTo(this.x, this.y);
+				const p = { x: this.x, y: this.y };
+				ctx.lineTo(p.x, p.y);
+				this.current.push(p);
 				ctx.stroke();
 			}
 		};
 		this.up = (e) => {
 			this.canDraw = false;
+			this.stacks.push(this.current);
+		};
+		this.down = (e) => {
+			const ctx = this.context;
+			this.canDraw = true;
+			this.x = e.layerX;
+			this.y = e.layerY;
+			ctx.beginPath();
+			this.current = [];
+			const p = { x: this.x, y: this.y };
+			this.current.push(p);
+			ctx.moveTo(p.x, p.y);
 		};
 	}
 	init() {
@@ -68,23 +84,41 @@ class startDraw {
 	}
 	bindEvent() {
 		const el = this.el;
-		const ctx = this.context;
-		el.addEventListener('mousedown', (e: any) => {
-			this.canDraw = true;
-			this.x = e.layerX;
-			this.y = e.layerY;
-			ctx.beginPath();
-			ctx.moveTo(this.x, this.y);
-		});
+		el.addEventListener('mousedown', this.down);
 		document.addEventListener('mousemove', this.move);
 		document.addEventListener('mouseup', this.up);
+	}
+	removeEvent() {
+		const el = this.el;
+		el.removeEventListener('mousedown', this.down);
+		document.removeEventListener('mousemove', this.move);
+		document.removeEventListener('mouseup', this.up);
 	}
 	// 添加撤回操作
 	addRecall() {
 		document.addEventListener('keydown', (e) => {
 			if (e.ctrlKey && e.code === 'KeyZ') {
-				console.log('撤回操作');
+				this.stacks = this.stacks.slice(0, -1);
+				this.rePatint();
 			}
+		});
+	}
+	// 重新绘制点
+	rePatint() {
+		this.clear();
+		if (!this.stacks.length) {
+			console.log('没有内容');
+			return;
+		}
+		const ctx = this.context;
+		this.stacks.forEach((p) => {
+			const s = p[0];
+			ctx.beginPath();
+			ctx.moveTo(s.x, s.y);
+			p.slice(1).forEach((p_v) => {
+				ctx.lineTo(p_v.x, p_v.y);
+			});
+			ctx.stroke();
 		});
 	}
 	clear() {
