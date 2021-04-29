@@ -21,6 +21,14 @@ class startDraw {
 	left_v?: number; // x轴偏移量
 	top_v?: number; // y轴偏移量
 	constructor(el, config = {}) {
+		if (!(el instanceof HTMLCanvasElement)) {
+			const style = window.getComputedStyle(el, null);
+			const _el = document.createElement('canvas');
+			_el.style.width = style.width;
+			_el.style.height = style.height;
+			el.appendChild(_el);
+			el = _el;
+		}
 		this.el = el;
 		const _conf = {
 			lineWidth: 6,
