@@ -18,6 +18,8 @@ class startDraw {
 	canDraw?: boolean;
 	x?: number;
 	y?: number;
+	left_v?: number; // x轴偏移量
+	top_v?: number; // y轴偏移量
 	constructor(el, config = {}) {
 		this.el = el;
 		const _conf = {
@@ -32,10 +34,13 @@ class startDraw {
 					e.preventDefault();
 					e = e.touches[0];
 				}
+				const p = {
+					x: e.clientX - this.left_v,
+					y: e.clientY - this.top_v
+				};
 				const ctx = this.context;
-				this.x = e.clientX;
-				this.y = e.clientY;
-				const p = { x: this.x, y: this.y };
+				this.x = p.x;
+				this.y = p.y;
 				ctx.lineTo(p.x, p.y);
 				this.current.push(p);
 				ctx.stroke();
@@ -49,13 +54,13 @@ class startDraw {
 		};
 		this.down = (e) => {
 			e = this.isMobile() ? e.touches[0] : e;
+			const p = { x: e.clientX - this.left_v, y: e.clientY - this.top_v };
 			const ctx = this.context;
 			this.canDraw = true;
-			this.x = e.clientX;
-			this.y = e.clientY;
+			this.x = p.x;
+			this.y = p.y;
 			ctx.beginPath();
 			this.current = [];
-			const p = { x: this.x, y: this.y };
 			this.current.push(p);
 			ctx.moveTo(p.x, p.y);
 		};
@@ -88,6 +93,13 @@ class startDraw {
 
 		this.bindEvent();
 		this.addRecall();
+		this.getPositionValue();
+	}
+	// 获取偏移量
+	getPositionValue() {
+		const style = this.el.getBoundingClientRect();
+		this.left_v = style.left;
+		this.top_v = style.top;
 	}
 	isMobile() {
 		return /phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone/i.test(
