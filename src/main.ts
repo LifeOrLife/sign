@@ -54,7 +54,7 @@ class startDraw {
 				ctx.stroke();
 			}
 		};
-		this.up = (e) => {
+		this.up = () => {
 			if (this.canDraw) {
 				this.stacks.push(this.current);
 			}
@@ -75,9 +75,9 @@ class startDraw {
 	}
 	init() {
 		const canvas = this.el as HTMLCanvasElement;
-		let { width, height } = window.getComputedStyle(canvas, null);
-		let w = parseInt(width);
-		let h = parseInt(height);
+		const { width, height } = window.getComputedStyle(canvas, null);
+		const w = parseInt(width);
+		const h = parseInt(height);
 		this.context = canvas.getContext('2d');
 		this.width = w;
 		this.height = h;
