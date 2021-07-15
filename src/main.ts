@@ -15,6 +15,7 @@ class startDraw {
 	move?: (e) => void;
 	up?: (e) => void;
 	down?: (e) => void;
+	contextmenu?: (e) => void;
 	canDraw?: boolean;
 	x?: number;
 	y?: number;
@@ -61,6 +62,10 @@ class startDraw {
 			this.canDraw = false;
 		};
 		this.down = (e) => {
+			if (e.button === 2) {
+				// 右键
+				return ;
+			}
 			e = this.isMobile() ? e.touches[0] : e;
 			const p = { x: e.clientX - this.left_v, y: e.clientY - this.top_v };
 			const ctx = this.context;
@@ -72,6 +77,11 @@ class startDraw {
 			this.current.push(p);
 			ctx.moveTo(p.x, p.y);
 		};
+		// 阻止默认右键事件
+		this.contextmenu = (e) => {
+			e.preventDefault();
+			return false;
+		}
 	}
 	init() {
 		const canvas = this.el as HTMLCanvasElement;
@@ -127,6 +137,7 @@ class startDraw {
 		el.addEventListener(down, this.down);
 		document.addEventListener(move, this.move, { passive: false });
 		document.addEventListener(up, this.up);
+		el.addEventListener('contextmenu', this.contextmenu);
 	}
 	removeEvent() {
 		const el = this.el;
@@ -141,6 +152,7 @@ class startDraw {
 		el.removeEventListener(down, this.down);
 		document.removeEventListener(move, this.move);
 		document.removeEventListener(up, this.up);
+		el.addEventListener('contextmenu', this.contextmenu);
 	}
 	// 添加撤回操作
 	addRecall() {
